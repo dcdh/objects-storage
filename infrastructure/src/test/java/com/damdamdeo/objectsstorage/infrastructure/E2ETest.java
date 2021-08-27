@@ -38,7 +38,7 @@ public class E2ETest {
                 .when()
                 .get("/objects")
                 .then()
-                .log().all()
+                .log().headers()
                 .statusCode(200)
                 .extract()
                 .headers();

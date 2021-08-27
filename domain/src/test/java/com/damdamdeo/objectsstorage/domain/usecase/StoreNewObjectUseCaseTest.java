@@ -42,4 +42,39 @@ public class StoreNewObjectUseCaseTest {
         inOrder.verify(givenStoredObjectRepository, times(1)).store(any());
     }
 
+    @Test
+    public void should_throw_unable_to_extract_metadata_exception_when_object_cannot_be_parsed() {
+        // Given
+        final MetadataExtractor givenMetadataExtractor = mock(MetadataExtractor.class);
+        final StoredObjectRepository givenStoredObjectRepository = mock(StoredObjectRepository.class);
+        final StoreNewObjectUseCase givenStoreNewObjectUseCase = new StoreNewObjectUseCase(givenMetadataExtractor, givenStoredObjectRepository);
+        final ObjectLocation givenObjectLocation = mock(ObjectLocation.class);
+        doThrow(new UnableToExtractMetadataException()).when(givenMetadataExtractor).extract("content".getBytes());
+
+        // When && Then
+        assertThatThrownBy(() -> givenStoreNewObjectUseCase.execute(new StoreNewObjectCommand(givenObjectLocation, "content".getBytes())))
+                .isInstanceOf(UnableToExtractMetadataException.class);
+        verify(givenMetadataExtractor, times(1)).extract(any());
+    }
+
+    @Test
+    public void should_throw_stored_object_repository_exception_when_an_exception_occurs_from_the_object_repository() {
+        // Given
+        final MetadataExtractor givenMetadataExtractor = mock(MetadataExtractor.class);
+        final StoredObjectRepository givenStoredObjectRepository = mock(StoredObjectRepository.class);
+        final StoreNewObjectUseCase givenStoreNewObjectUseCase = new StoreNewObjectUseCase(givenMetadataExtractor, givenStoredObjectRepository);
+        final ObjectCreated givenObjectCreated = mock(ObjectCreated.class);
+        final Metadata givenMetadata = mock(Metadata.class);
+        doReturn(givenMetadata).when(givenMetadataExtractor).extract("content".getBytes());
+        final ObjectLocation givenObjectLocation = mock(ObjectLocation.class);
+        doThrow(new StoredObjectRepositoryException(givenObjectLocation)).when(givenStoredObjectRepository).store(new CreateObject(givenMetadata, givenObjectLocation, "content".getBytes()));
+
+        // When && Then
+        assertThatThrownBy(() -> givenStoreNewObjectUseCase.execute(new StoreNewObjectCommand(givenObjectLocation, "content".getBytes())))
+                .isInstanceOf(StoredObjectRepositoryException.class)
+                .hasFieldOrPropertyWithValue("objectLocation", givenObjectLocation);
+        verify(givenMetadataExtractor, times(1)).extract(any());
+        verify(givenStoredObjectRepository, times(1)).store(any());
+    }
+
 }

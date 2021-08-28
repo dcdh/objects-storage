@@ -2,6 +2,7 @@ package com.damdamdeo.objectsstorage.infrastructure.s3;
 
 import com.damdamdeo.objectsstorage.domain.*;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.opentracing.Traced;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
@@ -27,6 +28,7 @@ public class S3StoredObjectRepository implements StoredObjectRepository {
     }
 
     @Override
+    @Traced
     public ObjectCreated store(final CreateObject createObject) throws StoredObjectRepositoryException {
         try {
             final PutObjectRequest putObjectRequest = PutObjectRequest.builder()
@@ -49,6 +51,7 @@ public class S3StoredObjectRepository implements StoredObjectRepository {
     }
 
     @Override
+    @Traced
     public StoredObject get(final ObjectLocation objectLocation) throws UnknownStoredObjectException, StoredObjectRepositoryException {
         try {
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();

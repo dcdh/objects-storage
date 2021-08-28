@@ -5,6 +5,7 @@ import com.damdamdeo.objectsstorage.domain.MetadataExtractor;
 import com.damdamdeo.objectsstorage.domain.UnableToExtractMetadataException;
 import io.quarkus.tika.TikaParseException;
 import io.quarkus.tika.TikaParser;
+import org.eclipse.microprofile.opentracing.Traced;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.io.ByteArrayInputStream;
@@ -21,6 +22,7 @@ public class TikaMetadataExtractor implements MetadataExtractor {
     }
 
     @Override
+    @Traced
     public Metadata extract(final byte[] content) throws UnableToExtractMetadataException {
         final InputStream inputStream = new ByteArrayInputStream(content);
         try {

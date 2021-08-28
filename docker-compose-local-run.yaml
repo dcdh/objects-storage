@@ -16,5 +16,15 @@ services:
     ports:
       - 8080:8080
     environment:
-      - JAVA_OPTIONS=-Dquarkus.s3.endpoint-override=http://zenko:8000
+      - JAVA_OPTIONS=-Dquarkus.s3.endpoint-override=http://zenko:8000 -Dquarkus.jaeger.endpoint=http://jaeger-collector:14268/api/traces
     restart: unless-stopped
+
+  jaeger-collector:
+    image: jaegertracing/all-in-one:1.25.0
+    ports:
+      - "5775:5775"
+      - "6831:6831"
+      - "6832:6832"
+      - "5778:5778"
+      - "16686:16686"
+      - "14268:14268"
